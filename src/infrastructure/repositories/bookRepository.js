@@ -17,7 +17,7 @@ class BookRepository {
       book.Author,
       book.description,
       book.genre,
-      book.price,
+      parseFloat(book.price),
       book.quantity
     );
   }

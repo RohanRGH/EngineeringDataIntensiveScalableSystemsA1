@@ -39,28 +39,37 @@ const getCustomerById = async (req, res, next) => {
 };
 
 const getCustomerByUserId = async (req, res, next) => {
-  try {
-    const { userId } = req.query;
-    
-    if (!userId) {
-      const error = new Error('User ID is required');
-      error.statusCode = 400;
-      throw error;
+    try {
+      const { userId } = req.query;
+      
+      if (!userId) {
+        const error = new Error('User ID is required');
+        error.statusCode = 400;
+        throw error;
+      }
+      
+      // Email validation using regex
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(userId)) {
+        const error = new Error('Invalid email format');
+        error.statusCode = 400;
+        throw error;
+      }
+      
+      const customer = await customerService.getCustomerByUserId(userId);
+      
+      if (!customer) {
+        const error = new Error('Customer not found');
+        error.statusCode = 404;
+        throw error;
+      }
+      
+      res.status(200).json(customer);
+    } catch (error) {
+      next(error);
     }
-    
-    const customer = await customerService.getCustomerByUserId(userId);
-    
-    if (!customer) {
-      const error = new Error('Customer not found');
-      error.statusCode = 404;
-      throw error;
-    }
-    
-    res.status(200).json(customer);
-  } catch (error) {
-    next(error);
-  }
-};
+  };
+  
 
 module.exports = {
   addCustomer,
